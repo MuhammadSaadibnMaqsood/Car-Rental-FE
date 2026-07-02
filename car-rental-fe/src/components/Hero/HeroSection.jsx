@@ -1,211 +1,110 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { MapPin, Calendar, ChevronRight, Star, Shield, Zap, ArrowRight } from 'lucide-react';
 
-// ─── Floating orb decorations ───────────────────────────────────────────────
-const Orb = ({ className }) => (
-  <div
-    className={`absolute rounded-full blur-3xl opacity-30 pointer-events-none ${className}`}
-  />
-);
+// ─── Jungle particle (falling leaf dot) ─────────────────────────────────────
+const JungleParticles = () => {
+  const particles = Array.from({ length: 12 }, (_, i) => ({
+    id: i,
+    left: `${8 + i * 7.5}%`,
+    delay: i * 0.6,
+    size: 3 + (i % 4),
+    dur: 6 + (i % 5),
+  }));
 
-// ─── Animated stat pill ─────────────────────────────────────────────────────
-const StatBadge = ({ value, label, delay, refEl }) => (
-  <div
-    ref={refEl}
-    style={{ opacity: 0, transform: 'translateY(20px)' }}
-    className="flex flex-col items-center px-6 py-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10"
-  >
-    <span className="text-3xl font-black text-white leading-none" style={{ fontFamily: "'robert-medium', sans-serif" }}>
-      {value}
-    </span>
-    <span className="text-xs text-white/50 mt-1 tracking-widest uppercase">{label}</span>
-  </div>
-);
-
-// ─── Feature chip ────────────────────────────────────────────────────────────
-const FeatureChip = ({ Icon, label }) => (
-  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/8 backdrop-blur-sm border border-white/10 text-white/80 text-sm font-medium">
-    <Icon size={14} className="text-red-500" />
-    {label}
-  </div>
-);
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          className="absolute rounded-full opacity-0"
+          style={{
+            left: p.left,
+            top: '-10px',
+            width: p.size,
+            height: p.size,
+            background: `rgba(74, 222, 128, ${0.3 + (p.id % 3) * 0.15})`,
+            animation: `leafFall ${p.dur}s ${p.delay}s infinite linear`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes leafFall {
+          0%   { transform: translateY(-20px) translateX(0px) rotate(0deg); opacity: 0; }
+          10%  { opacity: 0.6; }
+          90%  { opacity: 0.3; }
+          100% { transform: translateY(100vh) translateX(40px) rotate(360deg); opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+};
 
 // ─── Hero Section ────────────────────────────────────────────────────────────
 const HeroSection = () => {
   const containerRef = useRef(null);
   const bgRef = useRef(null);
-  const overlayRef = useRef(null);
-  const badgeRef = useRef(null);
   const headlineRef = useRef(null);
-  const subRef = useRef(null);
-  const sublineRef = useRef(null);
-  const ctaRef = useRef(null);
-  const searchRef = useRef(null);
-  const statsRef = useRef([]);
-  const chipsRef = useRef(null);
+  const lineRef = useRef(null);
   const orb1Ref = useRef(null);
   const orb2Ref = useRef(null);
-  const carRef = useRef(null);
-  const lineRef = useRef(null);
+  const vineLRef = useRef(null);
+  const vineRRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // BG reveal
-      if (bgRef.current) {
-        tl.fromTo(bgRef.current,
-          { scale: 1.15, filter: 'brightness(0)' },
-          { scale: 1, filter: 'brightness(1)', duration: 2, ease: 'power2.out' }
-        );
-      }
+      // BG cinematic reveal
+      tl.fromTo(bgRef.current,
+        { scale: 1.12, filter: 'brightness(0) saturate(0)' },
+        { scale: 1, filter: 'brightness(1) saturate(1.1)', duration: 2.2, ease: 'power2.inOut' }
+      )
 
-      // Animated orbs
-      if (orb1Ref.current && orb2Ref.current) {
-        tl.fromTo([orb1Ref.current, orb2Ref.current],
-          { opacity: 0, scale: 0.5 },
-          { opacity: 0.35, scale: 1, duration: 1.8, stagger: 0.3, ease: 'power2.out' },
-          '-=1.4'
-        );
-      }
+        // Orbs pulse in
+        .fromTo([orb1Ref.current, orb2Ref.current],
+          { opacity: 0, scale: 0.4 },
+          { opacity: 1, scale: 1, duration: 2, stagger: 0.4, ease: 'power2.out' },
+          '-=1.6'
+        )
 
-      // Badge
-      if (badgeRef.current) {
-        tl.fromTo(badgeRef.current,
-          { opacity: 0, y: -20, scale: 0.9 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.6 },
-          '-=0.8'
-        );
-      }
+        // Vine decorations slide in
+        .fromTo(vineLRef.current,
+          { opacity: 0, x: -60, y: -30 },
+          { opacity: 1, x: 0, y: 0, duration: 1.2, ease: 'power3.out' },
+          '-=1.2'
+        )
+        .fromTo(vineRRef.current,
+          { opacity: 0, x: 60, y: -30 },
+          { opacity: 1, x: 0, y: 0, duration: 1.2, ease: 'power3.out' },
+          '-=1.1'
+        )
 
-      // Headline — split-word animation
-      if (headlineRef.current) {
-        const words = headlineRef.current.querySelectorAll('.word');
-        if (words.length > 0) {
-          tl.fromTo(words,
-            { opacity: 0, y: 60, skewY: 4 },
-            { opacity: 1, y: 0, skewY: 0, duration: 0.8, stagger: 0.08 },
-            '-=0.3'
-          );
-        }
-      }
+        // Headline words staggered
+        .fromTo(headlineRef.current.querySelectorAll('.word'),
+          { opacity: 0, y: 70, skewY: 5 },
+          { opacity: 1, y: 0, skewY: 0, duration: 0.85, stagger: 0.1 },
+          '-=0.3'
+        )
 
-      // Red line accent
-      if (lineRef.current) {
-        tl.fromTo(lineRef.current,
+        // Line accent
+        .fromTo(lineRef.current,
           { scaleX: 0, transformOrigin: 'left' },
-          { scaleX: 1, duration: 0.7, ease: 'power3.inOut' },
-          '-=0.3'
+          { scaleX: 1, duration: 0.8, ease: 'power3.inOut' },
+          '-=0.4'
         );
-      }
 
-      // Sub-headline
-      if (subRef.current) {
-        tl.fromTo(subRef.current,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.6 },
-          '-=0.3'
-        );
-      }
+      // Continuous orb breathing
+      gsap.to(orb1Ref.current, { scale: 1.15, opacity: 0.6, duration: 5, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      gsap.to(orb2Ref.current, { scale: 1.2, opacity: 0.5, duration: 7, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 2 });
 
-      // Subline
-      if (sublineRef.current) {
-        tl.fromTo(sublineRef.current,
-          { opacity: 0, y: 15 },
-          { opacity: 1, y: 0, duration: 0.5 },
-          '-=0.2'
-        );
-      }
-
-      // Feature chips
-      if (chipsRef.current && chipsRef.current.children.length > 0) {
-        tl.fromTo(chipsRef.current.children,
-          { opacity: 0, x: -20 },
-          { opacity: 1, x: 0, stagger: 0.08, duration: 0.5 },
-          '-=0.1'
-        );
-      }
-
-      // CTA buttons
-      if (ctaRef.current && ctaRef.current.children.length > 0) {
-        tl.fromTo(ctaRef.current.children,
-          { opacity: 0, y: 20, scale: 0.95 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.1 },
-          '-=0.2'
-        );
-      }
-
-      // Search bar
-      if (searchRef.current) {
-        tl.fromTo(searchRef.current,
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' },
-          '-=0.3'
-        );
-      }
-
-      // Stats
-      if (statsRef.current && statsRef.current.length > 0) {
-        tl.to(statsRef.current,
-          { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'back.out(1.4)' },
-          '-=0.3'
-        );
-      }
-
-      // Orb continuous float
-      if (orb1Ref.current) {
-        gsap.to(orb1Ref.current, {
-          y: -40, x: 20,
-          duration: 7,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-        });
-      }
-      if (orb2Ref.current) {
-        gsap.to(orb2Ref.current, {
-          y: 30, x: -25,
-          duration: 9,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: 2,
-        });
-      }
-
-      // Parallax on mouse move
+      // Parallax mouse move
       const handleMouse = (e) => {
-        const { innerWidth, innerHeight } = window;
-        const x = (e.clientX / innerWidth - 0.5) * 2;
-        const y = (e.clientY / innerHeight - 0.5) * 2;
-
-        if (bgRef.current) {
-          gsap.to(bgRef.current, {
-            x: x * 18,
-            y: y * 10,
-            duration: 1.2,
-            ease: 'power2.out',
-          });
-        }
-        if (orb1Ref.current) {
-          gsap.to(orb1Ref.current, {
-            x: x * 35,
-            duration: 1.5,
-            ease: 'power2.out',
-            overwrite: 'auto',
-          });
-        }
-        if (orb2Ref.current) {
-          gsap.to(orb2Ref.current, {
-            x: -x * 25,
-            duration: 1.8,
-            ease: 'power2.out',
-            overwrite: 'auto',
-          });
-        }
+        const rx = (e.clientX / window.innerWidth - 0.5) * 2;
+        const ry = (e.clientY / window.innerHeight - 0.5) * 2;
+        gsap.to(bgRef.current, { x: rx * 16, y: ry * 9, duration: 1.4, ease: 'power2.out' });
+        gsap.to(orb1Ref.current, { x: rx * 30, duration: 1.8, ease: 'power2.out', overwrite: 'auto' });
+        gsap.to(orb2Ref.current, { x: -rx * 22, duration: 2, ease: 'power2.out', overwrite: 'auto' });
       };
-
       window.addEventListener('mousemove', handleMouse);
       return () => window.removeEventListener('mousemove', handleMouse);
     }, containerRef);
@@ -213,94 +112,104 @@ const HeroSection = () => {
     return () => ctx.revert();
   }, []);
 
-  const words = ['INSTITUITION', 'TRANSPORTATION'];
+  const words = ['Maple', 'Bridge'];
 
   return (
     <section
       ref={containerRef}
       className="relative w-full min-h-screen overflow-hidden flex flex-col"
-      style={{ background: '#f8fafc' }}
+      style={{ background: '#050e06' }}
     >
       {/* ── Background image ── */}
       <div
         ref={bgRef}
         className="absolute inset-0 will-change-transform"
         style={{
-          backgroundImage: 'url(/hero-bg-light.png)',
+          backgroundImage: 'url(/hero-bg.png)',
           backgroundSize: 'cover',
-          backgroundPosition: 'center 60%',
-          filter: 'brightness(1)',
+          backgroundPosition: 'center 55%',
         }}
       />
 
       {/* ── Gradient overlays ── */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#f8fafc]/95 via-[#f8fafc]/50 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#f8fafc] via-transparent to-transparent" />
+      <div className="absolute inset-0"
+        style={{ background: 'linear-gradient(105deg, rgba(3,12,4,0.97) 0%, rgba(3,12,4,0.80) 35%, rgba(3,12,4,0.35) 65%, transparent 100%)' }} />
+      <div className="absolute inset-0"
+        style={{ background: 'linear-gradient(to top, rgba(3,12,4,1) 0%, rgba(3,12,4,0.5) 20%, transparent 50%)' }} />
+      <div className="absolute inset-0"
+        style={{ background: 'linear-gradient(to bottom, rgba(3,12,4,0.6) 0%, transparent 30%)' }} />
 
-      {/* ── Animated orbs ── */}
+      {/* ── Jungle green orbs ── */}
       <div
         ref={orb1Ref}
-        className="absolute top-1/4 left-1/3 w-[500px] h-[500px] rounded-full blur-3xl opacity-0"
-        style={{ background: 'radial-gradient(circle, rgba(220, 38, 38, 0.08) 0%, transparent 70%)' }}
+        className="absolute pointer-events-none"
+        style={{
+          top: '20%', left: '38%',
+          width: 520, height: 520,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(22,101,52,0.45) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+          opacity: 0,
+        }}
       />
       <div
         ref={orb2Ref}
-        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-3xl opacity-0"
-        style={{ background: 'radial-gradient(circle, rgba(29, 78, 216, 0.06) 0%, transparent 70%)' }}
+        className="absolute pointer-events-none"
+        style={{
+          bottom: '15%', right: '20%',
+          width: 380, height: 380,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(101,163,13,0.3) 0%, transparent 70%)',
+          filter: 'blur(50px)',
+          opacity: 0,
+        }}
       />
 
-      {/* ── Navbar ── */}
-      <nav className="relative z-20 flex items-center justify-between px-8 md:px-16 py-6">
-        <div className="flex items-center">
-          <img className='h-14 w-26' src="https://comforting-chebakia-469108.netlify.app/maplebridge-official-transparent.png" style={{ filter: 'brightness(0.1)' }} />
-          <div className="ml-2">
-            <span className="text-slate-800 font-bold text-xl tracking-tight" style={{ fontFamily: "'zentry', sans-serif" }}>MAPLIBRIDGE</span>
-          </div>
-        </div>
+      {/* ── Vine decorations (SVG) ── */}
+      <div ref={vineLRef} className="absolute top-0 left-0 w-48 h-64 pointer-events-none opacity-70 z-10">
+        <svg viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 0 Q40 60 10 120 Q-10 180 30 240 Q50 280 40 280" stroke="rgba(74,222,128,0.4)" strokeWidth="2" strokeLinecap="round" fill="none" />
+          <ellipse cx="35" cy="55" rx="22" ry="14" fill="rgba(34,197,94,0.25)" transform="rotate(-30 35 55)" />
+          <ellipse cx="15" cy="110" rx="18" ry="11" fill="rgba(22,163,74,0.3)" transform="rotate(20 15 110)" />
+          <ellipse cx="32" cy="170" rx="20" ry="12" fill="rgba(74,222,128,0.2)" transform="rotate(-15 32 170)" />
+          <ellipse cx="12" cy="225" rx="16" ry="10" fill="rgba(34,197,94,0.25)" transform="rotate(25 12 225)" />
+        </svg>
+      </div>
+      <div ref={vineRRef} className="absolute top-0 right-0 w-48 h-64 pointer-events-none opacity-60 z-10" style={{ transform: 'scaleX(-1)' }}>
+        <svg viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 0 Q40 60 10 120 Q-10 180 30 240 Q50 280 40 280" stroke="rgba(74,222,128,0.35)" strokeWidth="2" strokeLinecap="round" fill="none" />
+          <ellipse cx="35" cy="55" rx="22" ry="14" fill="rgba(22,163,74,0.2)" transform="rotate(-30 35 55)" />
+          <ellipse cx="15" cy="110" rx="18" ry="11" fill="rgba(34,197,94,0.25)" transform="rotate(20 15 110)" />
+          <ellipse cx="32" cy="170" rx="20" ry="12" fill="rgba(74,222,128,0.18)" transform="rotate(-15 32 170)" />
+        </svg>
+      </div>
 
-        <div className="hidden md:flex items-center gap-8">
-          {['Fleet', 'Partner Network', 'About Us'].map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors duration-200 cursor-pointer"
-            >
-              {item}
-            </a>
-          ))}
-        </div>
-      </nav>
+      {/* ── Falling particles ── */}
+      <JungleParticles />
 
       {/* ── Main content ── */}
-      <div className="relative z-10 flex flex-col justify-center flex-1 px-8 md:px-16 pb-16 max-w-3xl">
-
-        {/* Badge */}
-        <div
-          ref={badgeRef}
-          style={{ opacity: 0 }}
-          className="inline-flex items-center gap-2 self-start mb-6 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/10 backdrop-blur-sm"
-        >
-
-        </div>
-
-        {/* Headline */}
-        <div ref={headlineRef} className="mb-4 overflow-hidden">
+      <div className="relative z-20 flex flex-col justify-center top-35 flex-1 px-8 md:px-16 pb-16 max-w-3xl">        {/* Headline */}
+        <div ref={headlineRef} className="mb-5 ChangaOne overflow-visible">
           <h1
-            className="leading-none tracking-tighter text-slate-800"
+            className="leading-none tracking-tighter text-white"
             style={{
-              fontFamily: "'zentry', sans-serif",
-              fontSize: 'clamp(4rem, 10vw, 8rem)',
-              lineHeight: 0.9,
+              fontFamily: "'Changa One', sans-serif",
+              fontSize: 'clamp(3.5rem, 9vw, 7rem)',
+              lineHeight: 0.88,
+              textShadow: '0 0 80px rgba(74,222,128,0.15)',
             }}
           >
             {words.map((word, i) => (
-              <span
-                key={word}
-                className="word inline-block mr-[0.2em] last:mr-0"
-                style={{ display: 'inline-block', overflow: 'hidden' }}
-              >
-                {word === 'TRANSPORTATION' ? (
-                  <span className="text-red-600">{word}</span>
+              <span key={word} className="word ChangaOne" style={{ display: 'inline-block', marginRight: '0.18em' }}>
+                {i === 1 ? (
+                  <span style={{
+                    background: 'linear-gradient(135deg, #4ade80, #86efac)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}>
+                    {word}
+                  </span>
                 ) : (
                   word
                 )}
@@ -308,42 +217,34 @@ const HeroSection = () => {
             ))}
           </h1>
 
-          {/* Red line accent */}
+          {/* Animated green accent line */}
           <div
             ref={lineRef}
-            className="h-1 w-32 bg-gradient-to-r from-red-600 to-red-500 rounded-full mt-4"
-            style={{ transformOrigin: 'left' }}
+            className="mt-4 h-1 w-40 rounded-full"
+            style={{
+              background: 'linear-gradient(90deg, #4ade80, #86efac, transparent)',
+              transformOrigin: 'left',
+              boxShadow: '0 0 12px rgba(74,222,128,0.6)',
+            }}
           />
         </div>
-
-        {/* Sub-headline */}
-        <p
-          ref={subRef}
-          style={{ opacity: 0 }}
-          className="text-2xl md:text-3xl font-semibold text-slate-800 mb-3"
-        >
-          The world's finest cars,
-          <span className="text-slate-400"> at your command.</span>
-        </p>
-
-        {/* Subline */}
-        <p
-          ref={sublineRef}
-          style={{ opacity: 0 }}
-          className="text-slate-500 text-base md:text-lg leading-relaxed mb-6 max-w-xl"
-        >
-          From weekend escapes to executive transfers — experience driving as it was meant to be.
-          Zero compromise. Pure exhilaration.
-        </p>
-
       </div>
 
-      {/* ── Scroll indicator ── */}
-      <div className="absolute bottom-8 right-16 z-20 flex flex-col items-center gap-2 text-slate-400">
-        <div className="w-px h-12 bg-gradient-to-b from-transparent to-slate-300" />
-        <span className="text-[10px] tracking-widest uppercase rotate-90 translate-y-4">Scroll</span>
+      {/* ── Institution Founder Bottom Banner ── */}
+      <div className='absolute  bottom-15 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-6 text-white uppercase tracking-widest text-xs w-full max-w-5xl px-8 poppins'>
+        <div className='bg-white/20 h-px flex-1'></div>
+        <div className="font-semibold  tracking-[0.25em] whitespace-nowrap">Institution Founder</div>
+        <div className='bg-white/20 h-px flex-1'></div>
       </div>
-    </section>
+
+      {/* ── Scroll hint ── */}
+      <div className="absolute bottom-8 right-16 z-20 flex flex-col items-center gap-2" style={{ color: 'rgba(74,222,128,0.3)' }}>
+        <div className="w-px h-12" style={{ background: 'linear-gradient(to bottom, transparent, rgba(74,222,128,0.4))' }} />
+        <span className="text-[10px] tracking-widest uppercase" style={{ transform: 'rotate(90deg) translateY(16px)', display: 'block' }}>Scroll</span>
+      </div>
+
+
+    </section >
   );
 };
 

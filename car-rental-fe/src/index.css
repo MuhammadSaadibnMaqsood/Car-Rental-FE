@@ -1,63 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,300;1,9..40,400&family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Changa+One:ital@0;1&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,300;1,9..40,400&family=Bebas+Neue&display=swap');
-
-/* Custom fonts from public/fonts/ */
-@font-face {
-  font-family: 'zentry';
-  src: url('/fonts/zentry-regular.woff2') format('woff2');
-  font-weight: normal;
+.ChangaOne {
+  font-family: "Changa One", sans-serif;
+  font-weight: 400;
   font-style: normal;
-  font-display: swap;
 }
 
-@font-face {
-  font-family: 'circular-web';
-  src: url('/fonts/circularweb-book.woff2') format('woff2');
-  font-weight: normal;
+.poppins {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
   font-style: normal;
-  font-display: swap;
 }
 
-@font-face {
-  font-family: 'general';
-  src: url('/fonts/general.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'robert-regular';
-  src: url('/fonts/robert-regular.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'robert-medium';
-  src: url('/fonts/robert-medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@theme {
-  --font-sans: 'circular-web', sans-serif;
-  --font-display: 'zentry', sans-serif;
-  --font-general: 'general', sans-serif;
-  --font-robert: 'robert-regular', sans-serif;
-  --font-robert-medium: 'robert-medium', sans-serif;
-
-  --color-brand-red: #DC2626;
-  --color-brand-red-light: #EF4444;
-  --color-brand-dark: #0F172A;
-  --color-brand-slate: #1E293B;
-  --color-brand-mid: #334155;
-}
-
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -77,9 +36,18 @@ body {
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #f8fafc; }
-::-webkit-scrollbar-thumb { background: #DC2626; border-radius: 99px; }
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #05552f;
+  border-radius: 99px;
+}
 
 /* Noise texture overlay */
 .noise::before {
