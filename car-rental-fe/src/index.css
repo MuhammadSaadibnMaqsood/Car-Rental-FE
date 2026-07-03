@@ -55,7 +55,7 @@ em {
   height: 46px;
   border: 1px solid rgba(201, 168, 105, 0.4);
   border-radius: 50%;
-  background: rgba(10, 10, 13, 0.4);
+  background: var(--gold-soft);
   backdrop-filter: blur(6px);
   display: flex;
   flex-direction: column;
@@ -68,7 +68,7 @@ em {
 .nav-toggle .bar {
   width: 16px;
   height: 1px;
-  background: var(--gold-soft);
+  background: white;
   transition: all 0.3s ease;
 }
 
@@ -207,21 +207,6 @@ em {
   background: var(--gold);
 }
 
-.hero-title {
-  font-size: clamp(48px, 7vw, 92px);
-  line-height: 1.02;
-  color: var(--ivory);
-  font-weight: 500;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.hero-title.in {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 .hero-sub {
   margin-top: 26px;
   font-size: 17px;
@@ -229,28 +214,12 @@ em {
   color: var(--grey);
   font-weight: 300;
   max-width: 480px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 1s ease 0.2s;
-}
-
-.hero-sub.in {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 .hero-cta {
   display: flex;
   gap: 18px;
   margin-top: 44px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 1s ease 0.4s;
-}
-
-.hero-cta.in {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 .btn-gold {
@@ -588,5 +557,110 @@ em {
 
   .hero-corner-br {
     display: none;
+  }
+}
+
+
+/* CLAUDE  */
+
+/* Add these to your existing stylesheet (e.g. hero.css) alongside the current rules.
+   They don't replace your layout styles — they add the plumbing GSAP needs. */
+
+/* Title line reveal masking */
+.hero-title .title-line-wrap {
+  display: inline-block;
+  overflow: hidden;
+  font-size: 5rem;
+}
+
+.hero-title .title-line {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* Parallax layer needs room to move without exposing edges */
+.hero-canvas {
+  will-change: transform;
+}
+
+/* Fleet cards: give GSAP a 3D stage to tilt within */
+.fleet-grid {
+  perspective: 1200px;
+}
+
+.tilt-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: box-shadow 0.3s ease;
+}
+
+.tilt-card:hover {
+  box-shadow: 0 20px 40px rgba(17, 18, 21, 0.08);
+}
+
+/* Radial glow that follows the cursor inside each card */
+.card-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184, 151, 83, 0.16) 0%, rgba(184, 151, 83, 0) 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tilt-card h3,
+.tilt-card p {
+  position: relative;
+  z-index: 1;
+}
+
+/* Magnetic buttons: let GSAP move them without layout jump */
+.btn-gold,
+.btn-ghost {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* Ambient scroll cue line, pulsed via GSAP */
+.scroll-line {
+  will-change: transform;
+}
+
+.logo-img-container img {
+  height: 2rem;
+  /* h-16 */
+  width: auto;
+  /* margin-top: 30px; */
+  border-radius: 50%;
+  /* border: 1px solid black; */
+  /* w-auto */
+  opacity: 0.9;
+  /* opacity-90 */
+  transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* transition-opacity */
+}
+
+.logo-img-container {
+  opacity: 1;
+  border-radius: 50%;
+  margin-top: 10px;
+  /* hover:opacity-100 */
+}
+
+/* Respect reduced-motion users: fall back to a simple fade, no parallax/tilt */
+@media (prefers-reduced-motion: reduce) {
+
+  .tilt-card,
+  .hero-canvas,
+  .btn-gold,
+  .btn-ghost,
+  .scroll-line {
+    transition: none !important;
+    animation: none !important;
   }
 }

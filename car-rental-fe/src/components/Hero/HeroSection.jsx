@@ -1,394 +1,267 @@
-import React, { useRef, useMemo, useState, useEffect, Suspense } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  Environment,
-  ContactShadows,
-  Float,
-  Sparkles,
-} from "@react-three/drei";
-import { Model as RealMaybachCar } from "../../../Maybach";
+import { useState, useEffect, useRef, useLayoutEffect, useCallback } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import HeroScene from "./HeroScene";
+import NavDrawer from "../Navbar/NavDrawer";
+import Footer from "../Footer/footer";
 
-/* ---------------------------------------------------------
-   COLOR / THEME
-   Crisp pearl white + champagne gold, rich light elite feel
---------------------------------------------------------- */
-const GOLD = "#b89753";       // Deepened slightly for crisp contrast on light backgrounds
-const LIGHT_BG = "#fcfcfd";   // Premium off-white
-const TEXT_DARK = "#111215";  // Deep charcoal for crisp typography
-const CAR_PAINT = "#f4f4f6";  // High-end pearl metallic white
+gsap.registerPlugin(ScrollTrigger);
 
-/* ---------------------------------------------------------
-   PROCEDURAL SEDAN MODEL
---------------------------------------------------------- */
-function MaybachCar({ ...props }) {
-  const group = useRef();
-  const wheelFL = useRef();
-  const wheelFR = useRef();
-  const wheelRL = useRef();
-  const wheelRR = useRef();
+const GOLD = "#b89753";
+const LIGHT_BG = "#fcfcfd";
+const TEXT_DARK = "#111215";
 
-  useFrame((state, delta) => {
-    const t = state.clock.getElapsedTime();
-    if (group.current) {
-      group.current.position.y = Math.sin(t * 0.6) * 0.04;
-      group.current.rotation.y = Math.sin(t * 0.15) * 0.05 + props.baseRotation;
-    }
-    [wheelFL, wheelFR, wheelRL, wheelRR].forEach((w) => {
-      if (w.current) w.current.rotation.x -= delta * 1.2;
-    });
-  });
+const STATS = [
+  ["9", "Major Canadian Cities"],
+  ["20+", "Years Experience"],
+  ["PIPEDA", "Compliant Data Handling"],
+  ["CAD", "Consolidated Billing"],
+];
 
-  const bodyMat = (
-    <meshPhysicalMaterial
-      color={CAR_PAINT}
-      metalness={0.4}
-      roughness={0.1}
-      clearcoat={1.0}
-      clearcoatRoughness={0.02}
-      reflectivity={0.9}
-    />
-  );
-
-  const chromeMat = (
-    <meshStandardMaterial color="#d1cbd4" metalness={1} roughness={0.05} />
-  );
-
-  const glassMat = (
-    <meshPhysicalMaterial
-      color="#1a2226"
-      metalness={0.5}
-      roughness={0}
-      transmission={0.4}
-      transparent
-      opacity={0.9}
-    />
-  );
-
-  const goldMat = (
-    <meshStandardMaterial color={GOLD} metalness={0.8} roughness={0.2} />
-  );
-
-  return (
-    <group ref={group} {...props} dispose={null}>
-      {/* Main lower body */}
-      <mesh position={[0, 0.42, 0]} castShadow receiveShadow>
-        <boxGeometry args={[5.6, 0.55, 1.9]} />
-        {bodyMat}
-      </mesh>
-
-      {/* Front nose taper */}
-      <mesh position={[2.55, 0.42, 0]} castShadow>
-        <boxGeometry args={[0.5, 0.5, 1.75]} />
-        {bodyMat}
-      </mesh>
-
-      {/* Rear taper */}
-      <mesh position={[-2.55, 0.42, 0]} castShadow>
-        <boxGeometry args={[0.5, 0.5, 1.75]} />
-        {bodyMat}
-      </mesh>
-
-      {/* Hood */}
-      <mesh position={[1.55, 0.72, 0]} rotation={[0, 0, 0.02]} castShadow>
-        <boxGeometry args={[1.9, 0.14, 1.7]} />
-        {bodyMat}
-      </mesh>
-
-      {/* Trunk deck */}
-      <mesh position={[-1.75, 0.72, 0]} castShadow>
-        <boxGeometry args={[1.4, 0.14, 1.7]} />
-        {bodyMat}
-      </mesh>
-
-      {/* Greenhouse / cabin */}
-      <mesh position={[-0.15, 1.0, 0]} castShadow>
-        <boxGeometry args={[2.5, 0.5, 1.55]} />
-        {bodyMat}
-      </mesh>
-
-      {/* Roof panel */}
-      <mesh position={[-0.15, 1.27, 0]} castShadow>
-        <boxGeometry args={[2.1, 0.12, 1.45]} />
-        {bodyMat}
-      </mesh>
-
-      {/* Windshield */}
-      <mesh position={[0.85, 1.05, 0]} rotation={[0, 0, -0.55]} castShadow>
-        <boxGeometry args={[0.65, 0.05, 1.4]} />
-        {glassMat}
-      </mesh>
-
-      {/* Rear windshield */}
-      <mesh position={[-1.1, 1.03, 0]} rotation={[0, 0, 0.5]} castShadow>
-        <boxGeometry args={[0.55, 0.05, 1.4]} />
-        {glassMat}
-      </mesh>
-
-      {/* Side windows */}
-      <mesh position={[-0.15, 1.03, 0.76]}>
-        <boxGeometry args={[2.3, 0.35, 0.02]} />
-        {glassMat}
-      </mesh>
-      <mesh position={[-0.15, 1.03, -0.76]}>
-        <boxGeometry args={[2.3, 0.35, 0.02]} />
-        {glassMat}
-      </mesh>
-
-      {/* Chrome window trim */}
-      <mesh position={[-0.15, 1.24, 0.775]}>
-        <boxGeometry args={[2.55, 0.04, 0.03]} />
-        {chromeMat}
-      </mesh>
-      <mesh position={[-0.15, 1.24, -0.775]}>
-        <boxGeometry args={[2.55, 0.04, 0.03]} />
-        {chromeMat}
-      </mesh>
-
-      {/* Chrome grille */}
-      <mesh position={[2.78, 0.55, 0]} castShadow>
-        <boxGeometry args={[0.08, 0.55, 1.15]} />
-        {chromeMat}
-      </mesh>
-      {/* Grille slats */}
-      {Array.from({ length: 7 }).map((_, i) => (
-        <mesh key={i} position={[2.83, 0.55, -0.5 + i * 0.17]}>
-          <boxGeometry args={[0.03, 0.5, 0.04]} />
-          {goldMat}
-        </mesh>
-      ))}
-
-      {/* Hood emblem stand */}
-      <mesh position={[2.8, 0.86, 0]}>
-        <cylinderGeometry args={[0.015, 0.015, 0.12, 8]} />
-        {chromeMat}
-      </mesh>
-      <mesh position={[2.8, 0.94, 0]}>
-        <sphereGeometry args={[0.045, 16, 16]} />
-        {goldMat}
-      </mesh>
-
-      {/* Bumpers */}
-      <mesh position={[2.75, 0.32, 0]} castShadow>
-        <boxGeometry args={[0.25, 0.28, 1.85]} />
-        {bodyMat}
-      </mesh>
-      <mesh position={[-2.75, 0.32, 0]} castShadow>
-        <boxGeometry args={[0.25, 0.28, 1.85]} />
-        {bodyMat}
-      </mesh>
-
-      {/* Headlights */}
-      <mesh position={[2.86, 0.6, 0.62]}>
-        <boxGeometry args={[0.05, 0.14, 0.35]} />
-        <meshStandardMaterial color="#ffffff" emissive="#fff2d8" emissiveIntensity={1.0} />
-      </mesh>
-      <mesh position={[2.86, 0.6, -0.62]}>
-        <boxGeometry args={[0.05, 0.14, 0.35]} />
-        <meshStandardMaterial color="#ffffff" emissive="#fff2d8" emissiveIntensity={1.0} />
-      </mesh>
-
-      {/* Taillights */}
-      <mesh position={[-2.86, 0.62, 0.65]}>
-        <boxGeometry args={[0.05, 0.14, 0.3]} />
-        <meshStandardMaterial color="#5a0000" emissive="#ff1a1a" emissiveIntensity={0.8} />
-      </mesh>
-      <mesh position={[-2.86, 0.62, -0.65]}>
-        <boxGeometry args={[0.05, 0.14, 0.3]} />
-        <meshStandardMaterial color="#5a0000" emissive="#ff1a1a" emissiveIntensity={0.8} />
-      </mesh>
-
-      {/* Side skirts */}
-      <mesh position={[0, 0.62, 0.955]}>
-        <boxGeometry args={[5.0, 0.025, 0.02]} />
-        {goldMat}
-      </mesh>
-      <mesh position={[0, 0.62, -0.955]}>
-        <boxGeometry args={[5.0, 0.025, 0.02]} />
-        {goldMat}
-      </mesh>
-
-      {/* Door handles */}
-      {[0.85, -0.55].map((x, i) => (
-        <group key={i}>
-          <mesh position={[x, 0.72, 0.965]}>
-            <boxGeometry args={[0.22, 0.04, 0.03]} />
-            {chromeMat}
-          </mesh>
-          <mesh position={[x, 0.72, -0.965]}>
-            <boxGeometry args={[0.22, 0.04, 0.03]} />
-            {chromeMat}
-          </mesh>
-        </group>
-      ))}
-
-      {/* Wheels */}
-      {[
-        { ref: wheelFL, x: 1.75, z: 1.0 },
-        { ref: wheelFR, x: 1.75, z: -1.0 },
-        { ref: wheelRL, x: -1.75, z: 1.0 },
-        { ref: wheelRR, x: -1.75, z: -1.0 },
-      ].map((w, i) => (
-        <group key={i} ref={w.ref} position={[w.x, 0.42, w.z]} rotation={[0, 0, Math.PI / 2]}>
-          <mesh castShadow>
-            <cylinderGeometry args={[0.42, 0.42, 0.32, 32]} />
-            <meshPhysicalMaterial color="#15161a" roughness={0.6} metalness={0.2} />
-          </mesh>
-          <mesh position={[0, 0, 0]}>
-            <cylinderGeometry args={[0.27, 0.27, 0.34, 32]} />
-            <meshStandardMaterial color="#e2dee6" metalness={0.9} roughness={0.1} />
-          </mesh>
-          {Array.from({ length: 8 }).map((_, s) => (
-            <mesh
-              key={s}
-              rotation={[0, (s * Math.PI) / 4, 0]}
-              position={[0, 0, 0.17]}
-            >
-              <boxGeometry args={[0.05, 0.42, 0.03]} />
-              <meshStandardMaterial color="#c5c1ca" metalness={0.9} roughness={0.1} />
-            </mesh>
-          ))}
-          <mesh position={[0, 0, 0.175]}>
-            <sphereGeometry args={[0.055, 16, 16]} />
-            {goldMat}
-          </mesh>
-        </group>
-      ))}
-
-      {/* Exhaust tips */}
-      <mesh position={[-2.9, 0.28, 0.4]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.06, 0.06, 0.12, 16]} />
-        {chromeMat}
-      </mesh>
-      <mesh position={[-2.9, 0.28, -0.4]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.06, 0.06, 0.12, 16]} />
-        {chromeMat}
-      </mesh>
-    </group>
-  );
-}
-
-/* ---------------------------------------------------------
-   HERO 3D SCENE (Optimized for Light Background)
---------------------------------------------------------- */
-function HeroScene() {
-  return (
-    <Canvas
-      shadows
-      dpr={[1, 2]}
-      camera={{ position: [6.5, 2.2, 6.5], fov: 32 }}
-      gl={{ antialias: true }}
-    >
-      <color attach="background" args={[LIGHT_BG]} />
-      <fog attach="fog" args={[LIGHT_BG, 10, 22]} />
-
-      <ambientLight intensity={0.7} />
-      <spotLight
-        position={[6, 9, 4]}
-        angle={0.35}
-        penumbra={1}
-        intensity={1.8}
-        color={"#ffffff"}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-      />
-      <spotLight
-        position={[-6, 6, -4]}
-        angle={0.5}
-        penumbra={1}
-        intensity={0.6}
-        color={GOLD}
-      />
-      <pointLight position={[0, 2, 4]} intensity={0.4} color={"#ffffff"} />
-
-      <Suspense fallback={null}>
-        {/* 🚀 UPGRADED FLOAT: Adds gentle breathing, subtle tilt, and automatic slow rotation */}
-        <Float
-          speed={1.5}             // Speed of the floating animation (default was 1.2)
-          floatIntensity={1.2}    // Up-and-down movement range
-          rotationIntensity={0.6} // Allows the car to gently tilt side-to-side as it floats
-          autoInvalidate
-        >
-          <RealMaybachCar
-            position={[0, -0.2, 0]}
-            rotation={[0, 0.55, 0]} // Initial starting angle
-            scale={1.2}
-          />
-        </Float>
-
-        <ContactShadows
-          position={[0, 0.01, 0]}
-          opacity={0.35}
-          scale={16}
-          blur={2.4}
-          far={4}
-          color="#22262a"
-        />
-
-        <Sparkles count={30} scale={[12, 4, 12]} size={2} speed={0.25} color={GOLD} opacity={0.4} />
-
-        <Environment preset="studio" />
-      </Suspense>
-
-      <gridHelper args={[40, 40, "#e1e2e6", "#f0f1f5"]} position={[0, 0.001, 0]} />
-    </Canvas>
-  );
-}
-
-/* ---------------------------------------------------------
-   NAV DRAWER
---------------------------------------------------------- */
-function NavDrawer({ open, setOpen }) {
-  const links = [
-    "Institutional Services",
-    "Coverage Area",
-    "Events & Delegations",
-    "Safety & Compliance",
-    "Corporate Transportation"
-  ];
-  return (
-    <>
-      <button className="nav-toggle light" onClick={() => setOpen(!open)} aria-label="menu">
-        <span className={`bar ${open ? "open" : ""}`} />
-        <span className={`bar ${open ? "open" : ""}`} />
-        <span className={`bar ${open ? "open" : ""}`} />
-      </button>
-
-      <div className={`nav-drawer light ${open ? "active" : ""}`}>
-        <div className="nav-drawer-inner">
-          <div className="nav-mark">MAPLEBRIDGE</div>
-          <ul>
-            {links.map((l, i) => (
-              <li key={l} style={{ transitionDelay: `${i * 60}ms` }}>
-                <a href="#" onClick={() => setOpen(false)}>
-                  {l}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <div className="nav-foot">
-            <p>Toronto — Ottawa — Montréal — Vancouver — Calgary</p>
-            <p>+1 (888) 627-5313</p>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
-
-/* ---------------------------------------------------------
-   MAIN APP / HERO SECTION
---------------------------------------------------------- */
 export default function HeroSection() {
   const [navOpen, setNavOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
+
+  // refs for animation targets
+  const rootRef = useRef(null);
+  const toplineRef = useRef(null);
+  const titleRef = useRef(null);
+  const subRef = useRef(null);
+  const ctaRef = useRef(null);
+  const scrollHintRef = useRef(null);
+  const statsRef = useRef(null);
+  const statNumRefs = useRef([]);
+  const aboutLeftRef = useRef(null);
+  const aboutRightRef = useRef(null);
+  const fleetTitleRef = useRef(null);
+  const cardsRef = useRef([]);
+  const ctaSectionRef = useRef(null);
 
   useEffect(() => {
     const t = setTimeout(() => setLoaded(true), 300);
     return () => clearTimeout(t);
   }, []);
 
+  // ---------- HERO LOAD-IN TIMELINE ----------
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ delay: 0.15, defaults: { ease: "power4.out" } });
+
+      // Reset only the elements whose visibility we animate directly.
+      // titleRef.current (the <h1>) is intentionally excluded here — only its
+      // .title-line children get reset/animated below. autoAlpha:0 on the <h1>
+      // itself left it visibility:hidden forever, since nothing ever tweened
+      // the <h1> back to autoAlpha:1 — that was the bug hiding the title.
+      tl.set([toplineRef.current, subRef.current, scrollHintRef.current], {
+        autoAlpha: 0,
+      });
+      tl.set(titleRef.current.querySelectorAll(".title-line"), { autoAlpha: 0 });
+      tl.set(ctaRef.current.children, { autoAlpha: 0 });
+
+      tl.fromTo(
+        toplineRef.current,
+        { y: 16, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.7 },
+        0.1
+      )
+
+        // title lines fly up with a slight rotation, staggered per line
+        .fromTo(
+          titleRef.current.querySelectorAll(".title-line"),
+          { yPercent: 120, rotate: 3, autoAlpha: 0 },
+          { yPercent: 0, rotate: 0, autoAlpha: 1, duration: 1.1, stagger: 0.12 },
+          0.3
+        )
+
+        .fromTo(
+          subRef.current,
+          { y: 24, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.8 },
+          "-=0.6"
+        )
+
+        .fromTo(
+          ctaRef.current.children,
+          { y: 20, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.7, stagger: 0.1 },
+          "-=0.5"
+        )
+
+        .to(scrollHintRef.current, { autoAlpha: 1, duration: 0.6 }, "-=0.3");
+
+      // ambient scroll-cue loop (the little line pulsing)
+      gsap.to(".scroll-line", {
+        scaleY: 0.4,
+        transformOrigin: "top",
+        repeat: -1,
+        yoyo: true,
+        duration: 1.1,
+        ease: "sine.inOut",
+      });
+    }, rootRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // ---------- SCROLL-TRIGGERED SECTION REVEALS ----------
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      // Stats strip: fade/rise in, numbers count up if numeric
+      gsap.from(statsRef.current.querySelectorAll(".stat"), {
+        scrollTrigger: {
+          trigger: statsRef.current,
+          start: "top 85%",
+        },
+        y: 40,
+        autoAlpha: 0,
+        duration: 0.8,
+        stagger: 0.12,
+        ease: "power3.out",
+      });
+
+      statNumRefs.current.forEach((el) => {
+        if (!el) return;
+        const raw = el.dataset.value || "";
+        const match = raw.match(/^(\d+)(\+?)$/);
+        if (!match) return; // skip non-numeric stats like "PIPEDA" / "CAD"
+        const target = parseInt(match[1], 10);
+        const suffix = match[2] || "";
+        const counter = { val: 0 };
+        gsap.to(counter, {
+          val: target,
+          duration: 1.4,
+          ease: "power2.out",
+          scrollTrigger: { trigger: statsRef.current, start: "top 85%" },
+          onUpdate: () => {
+            el.textContent = Math.round(counter.val) + suffix;
+          },
+        });
+      });
+
+      // About section: left label + right paragraphs slide in from opposite sides
+      gsap.from(aboutLeftRef.current, {
+        scrollTrigger: { trigger: aboutLeftRef.current, start: "top 80%" },
+        x: -50,
+        autoAlpha: 0,
+        duration: 1,
+        ease: "power3.out",
+      });
+      gsap.from(aboutRightRef.current.querySelectorAll("p"), {
+        scrollTrigger: { trigger: aboutRightRef.current, start: "top 80%" },
+        x: 50,
+        autoAlpha: 0,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power3.out",
+      });
+
+      // Fleet heading
+      gsap.from(fleetTitleRef.current.children, {
+        scrollTrigger: { trigger: fleetTitleRef.current, start: "top 85%" },
+        y: 30,
+        autoAlpha: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power3.out",
+      });
+
+      // Fleet cards: staggered rise with a subtle 3D tilt-in
+      gsap.from(cardsRef.current, {
+        scrollTrigger: { trigger: ".fleet-grid", start: "top 80%" },
+        y: 60,
+        rotateX: -8,
+        transformOrigin: "top center",
+        autoAlpha: 0,
+        duration: 0.9,
+        stagger: 0.1,
+        ease: "power3.out",
+      });
+
+      // CTA section: gold text scales/fades in, button pops last
+      gsap.from(ctaSectionRef.current.querySelectorAll(".eyebrow, h2, p"), {
+        scrollTrigger: { trigger: ctaSectionRef.current, start: "top 80%" },
+        y: 30,
+        autoAlpha: 0,
+        duration: 0.8,
+        stagger: 0.12,
+        ease: "power3.out",
+      });
+      gsap.from(ctaSectionRef.current.querySelector(".btn-gold.large"), {
+        scrollTrigger: { trigger: ctaSectionRef.current, start: "top 70%" },
+        scale: 0.85,
+        autoAlpha: 0,
+        duration: 0.7,
+        ease: "back.out(1.7)",
+      });
+
+      // Parallax drift on the hero canvas layer
+      gsap.to(".hero-canvas", {
+        yPercent: 20,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".hero",
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+    }, rootRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // ---------- MAGNETIC / TILT CARD HOVER ----------
+  const addCardRef = (el) => {
+    if (el && !cardsRef.current.includes(el)) cardsRef.current.push(el);
+  };
+
+  const handleCardMove = useCallback((e) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const px = x / rect.width - 0.5;
+    const py = y / rect.height - 0.5;
+
+    gsap.to(card, {
+      rotateX: py * -8,
+      rotateY: px * 10,
+      scale: 1.03,
+      duration: 0.5,
+      ease: "power2.out",
+      transformPerspective: 700,
+    });
+
+    gsap.to(card.querySelector(".card-glow"), {
+      opacity: 1,
+      x: x - rect.width / 2,
+      y: y - rect.height / 2,
+      duration: 0.4,
+      ease: "power2.out",
+    });
+  }, []);
+
+  const handleCardLeave = useCallback((e) => {
+    const card = e.currentTarget;
+    gsap.to(card, { rotateX: 0, rotateY: 0, scale: 1, duration: 0.6, ease: "elastic.out(1, 0.6)" });
+    gsap.to(card.querySelector(".card-glow"), { opacity: 0, duration: 0.4 });
+  }, []);
+
+  // ---------- BUTTON MAGNETIC HOVER ----------
+  const handleBtnMove = useCallback((e) => {
+    const btn = e.currentTarget;
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    gsap.to(btn, { x: x * 0.25, y: y * 0.4, duration: 0.4, ease: "power2.out" });
+  }, []);
+
+  const handleBtnLeave = useCallback((e) => {
+    gsap.to(e.currentTarget, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.5)" });
+  }, []);
+
   return (
-    <div className="page light-theme" style={{ backgroundColor: LIGHT_BG, color: TEXT_DARK }}>
+    <div ref={rootRef} className="page light-theme" style={{ backgroundColor: LIGHT_BG, color: TEXT_DARK }}>
       <NavDrawer open={navOpen} setOpen={setNavOpen} />
 
       {/* HERO */}
@@ -398,52 +271,67 @@ export default function HeroSection() {
         </div>
 
         <div className="hero-overlay">
-          <div className="hero-topline" style={{ color: GOLD }}>
+          <div ref={toplineRef} className="hero-topline" style={{ color: GOLD }}>
             <span>PROUDLY CANADIAN</span>
             <span className="dot" style={{ backgroundColor: GOLD }} />
             <span>INSTITUTIONAL TRANSPORTATION</span>
           </div>
 
-          <h1 className={`hero-title ${loaded ? "in" : ""}`} style={{ color: TEXT_DARK }}>
-            MAPLE.
+          <h1 ref={titleRef} className="hero-title " style={{ color: TEXT_DARK }}>
+            <span className="title-line-wrap"><span className="title-line">MAPLE</span></span>
             <br />
-            <em style={{ color: GOLD }}>BRIDGE.</em>
+            <span className="title-line-wrap"><span className="title-line" style={{ color: GOLD, fontStyle: "italic" }}>BRIDGE.</span></span>
           </h1>
 
-          <p className={`hero-sub ${loaded ? "in" : ""}`} style={{ color: "#4a4d55" }}>
+          <p ref={subRef} className="hero-sub" style={{ color: "#4a4d55" }}>
             Structured, compliant, and professionally managed ground transportation for corporations,
             institutional organisations, and government bodies operating across Canada.
           </p>
 
-          <div className={`hero-cta ${loaded ? "in" : ""}`}>
-            <a href="#" className="btn-gold" style={{ backgroundColor: GOLD, color: "#fff" }}>
+          <div ref={ctaRef} className="hero-cta">
+            <a
+              href="#"
+              className="btn-gold"
+              style={{ backgroundColor: GOLD, color: "#fff" }}
+              onMouseMove={handleBtnMove}
+              onMouseLeave={handleBtnLeave}
+            >
               Request a Formal Proposal
             </a>
-            <a href="#" className="btn-ghost dark-outline" style={{ border: `1px solid ${TEXT_DARK}`, color: TEXT_DARK }}>
+            <a
+              href="#"
+              className="btn-ghost dark-outline"
+              style={{ border: `1px solid ${TEXT_DARK}`, color: TEXT_DARK }}
+              onMouseMove={handleBtnMove}
+              onMouseLeave={handleBtnLeave}
+            >
               Explore Coverage
             </a>
           </div>
         </div>
 
-        <div className="hero-scroll">
+        <div ref={scrollHintRef} className="hero-scroll">
           <span style={{ color: "#7a7e85" }}>SCROLL</span>
           <div className="scroll-line light-mode-line" style={{ backgroundColor: "#c5c8cf" }} />
         </div>
-
-        <div className="hero-corner-tl" style={{ color: "#8a8e95" }}>9 CANADIAN CITIES SUPPORTED</div>
-        <div className="hero-corner-br" style={{ color: "#8a8e95" }}>MAPLEBRIDGE NATIONAL PROGRAMME</div>
       </section>
 
       {/* STATS STRIP */}
-      <section className="stats light-strip" style={{ backgroundColor: "#f0f1f5", borderTop: "1px solid #e1e2e6", borderBottom: "1px solid #e1e2e6" }}>
-        {[
-          ["9", "Major Canadian Cities"],
-          ["20+", "Years Experience"],
-          ["PIPEDA", "Compliant Data Handling"],
-          ["CAD", "Consolidated Billing"],
-        ].map(([num, label]) => (
+      <section
+        ref={statsRef}
+        className="stats light-strip"
+        style={{ backgroundColor: "#f0f1f5", borderTop: "1px solid #e1e2e6", borderBottom: "1px solid #e1e2e6" }}
+      >
+        {STATS.map(([num, label], i) => (
           <div className="stat" key={label}>
-            <div className="stat-num" style={{ color: GOLD }}>{num}</div>
+            <div
+              className="stat-num"
+              style={{ color: GOLD }}
+              data-value={num}
+              ref={(el) => (statNumRefs.current[i] = el)}
+            >
+              {num}
+            </div>
             <div className="stat-label" style={{ color: "#4a4d55" }}>{label}</div>
           </div>
         ))}
@@ -451,13 +339,13 @@ export default function HeroSection() {
 
       {/* ABOUT / PHILOSOPHY */}
       <section className="about">
-        <div className="about-left">
+        <div ref={aboutLeftRef} className="about-left">
           <span className="eyebrow" style={{ color: GOLD }}>Built for Institutions</span>
           <h2 style={{ color: TEXT_DARK }}>
             Not a ride-hailing platform.<br />Not an aggregator.
           </h2>
         </div>
-        <div className="about-right">
+        <div ref={aboutRightRef} className="about-right">
           <p style={{ color: "#4a4d55" }}>
             Maplebridge is a professionally operated Canadian ground transportation company —
             structured for organisations that require formal proposals, service agreements, compliance
@@ -473,89 +361,80 @@ export default function HeroSection() {
 
       {/* FLEET / FEATURE GRID */}
       <section className="fleet" style={{ backgroundColor: "#f8f9fa" }}>
-        <span className="eyebrow center" style={{ color: GOLD }}>What We Deliver</span>
-        <h2 className="fleet-title" style={{ color: TEXT_DARK }}>Operational Excellence Behind Every Assignment</h2>
+        <div ref={fleetTitleRef}>
+          <span className="eyebrow center" style={{ color: GOLD }}>What We Deliver</span>
+          <h2 className="fleet-title" style={{ color: TEXT_DARK }}>Operational Excellence Behind Every Assignment</h2>
+        </div>
 
         <div className="fleet-grid">
-          <div className="fleet-card large light-card" style={{ backgroundColor: "#fff", border: "1px solid #e1e2e6" }}>
-            <h3 style={{ color: TEXT_DARK }}>Corporate Transportation Programmes</h3>
-            <p style={{ color: "#4a4d55" }}>
-              Centralised account management, consolidated CAD billing, and dedicated coordination
-              for corporations with recurring Canadian ground transportation requirements — across 1 city or all 9.
-            </p>
-          </div>
-          <div className="fleet-card light-card" style={{ backgroundColor: "#fff", border: "1px solid #e1e2e6" }}>
-            <h3 style={{ color: TEXT_DARK }}>Events & Delegation Logistics</h3>
-            <p style={{ color: "#4a4d55" }}>Full coordination for international summits, conferences, and board events with complete documentation.</p>
-          </div>
-          <div className="fleet-card light-card" style={{ backgroundColor: "#fff", border: "1px solid #e1e2e6" }}>
-            <h3 style={{ color: TEXT_DARK }}>Executive Airport Transfers</h3>
-            <p style={{ color: "#4a4d55" }}>Real-time flight monitoring, professional meet-and-greet, and prompt-free chauffeur positioning on arrival.</p>
-          </div>
-          <div className="fleet-card light-card" style={{ backgroundColor: "#fff", border: "1px solid #e1e2e6" }}>
-            <h3 style={{ color: TEXT_DARK }}>Safety & Compliance</h3>
-            <p style={{ color: "#4a4d55" }}>COI, provincial licensing, PIPEDA confirmation, and chauffeur credentialling ready for procurement vendor qualification.</p>
-          </div>
-          <div className="fleet-card large alt light-card" style={{ backgroundColor: "#fff", border: "1px solid #e1e2e6" }}>
-            <h3 style={{ color: TEXT_DARK }}>Institutional Procurement & Partnerships</h3>
-            <p style={{ color: "#4a4d55" }}>
-              Formal RFQ responses, service level agreements, standing offer frameworks, and global mobility
-              partnership arrangements for international networks.
-            </p>
-          </div>
+          {[
+            {
+              cls: "fleet-card large light-card",
+              title: "Corporate Transportation Programmes",
+              body: "Centralised account management, consolidated CAD billing, and dedicated coordination for corporations with recurring Canadian ground transportation requirements — across 1 city or all 9.",
+            },
+            {
+              cls: "fleet-card light-card",
+              title: "Events & Delegation Logistics",
+              body: "Full coordination for international summits, conferences, and board events with complete documentation.",
+            },
+            {
+              cls: "fleet-card light-card",
+              title: "Executive Airport Transfers",
+              body: "Real-time flight monitoring, professional meet-and-greet, and prompt-free chauffeur positioning on arrival.",
+            },
+            {
+              cls: "fleet-card light-card",
+              title: "Safety & Compliance",
+              body: "COI, provincial licensing, PIPEDA confirmation, and chauffeur credentialling ready for procurement vendor qualification.",
+            },
+            {
+              cls: "fleet-card large alt light-card",
+              title: "Institutional Procurement & Partnerships",
+              body: "Formal RFQ responses, service level agreements, standing offer frameworks, and global mobility partnership arrangements for international networks.",
+            },
+          ].map((card) => (
+            <div
+              key={card.title}
+              ref={addCardRef}
+              className={`${card.cls} tilt-card`}
+              style={{ backgroundColor: "#fff", border: "1px solid #e1e2e6", position: "relative", overflow: "hidden" }}
+              onMouseMove={handleCardMove}
+              onMouseLeave={handleCardLeave}
+            >
+              <span className="card-glow" />
+              <h3 style={{ color: TEXT_DARK }}>{card.title}</h3>
+              <p style={{ color: "#4a4d55" }}>{card.body}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* ENGAGEMENT / CTA */}
-      <section className="cta-section" style={{ borderTop: "1px solid #e1e2e6" }}>
+      <section ref={ctaSectionRef} className="cta-section" style={{ borderTop: "1px solid #e1e2e6" }}>
         <div className="cta-inner">
           <span className="eyebrow" style={{ color: GOLD }}>Engagement</span>
-          <h2 style={{ color: TEXT_DARK }}>
+          <h2 style={{ color: GOLD }}>
             National Service. <em style={{ color: GOLD }}>Local Precision.</em>
           </h2>
           <p style={{ color: "#4a4d55" }}>
             Submit a formal proposal request through our secure institutional inquiry channel —
             or contact the corporate team directly. All submissions acknowledged within one business day.
           </p>
-          <a href="#" className="btn-gold large" style={{ backgroundColor: GOLD, color: "#fff" }}>
+          <a
+            href="#"
+            className="btn-gold large"
+            style={{ backgroundColor: GOLD, color: "#fff" }}
+            onMouseMove={handleBtnMove}
+            onMouseLeave={handleBtnLeave}
+          >
             Request a Formal Proposal
           </a>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="footer" style={{ backgroundColor: "#111215", color: "#fff", paddingTop: "60px" }}>
-        <div className="footer-top">
-          <div className="footer-mark" style={{ color: GOLD }}>MAPLEBRIDGE</div>
-          <div className="footer-links">
-            <div>
-              <h4 style={{ color: GOLD }}>Services</h4>
-              <a href="#" style={{ color: "#c5c8cf" }}>Institutional Services</a>
-              <a href="#" style={{ color: "#c5c8cf" }}>Events & Delegations</a>
-              <a href="#" style={{ color: "#c5c8cf" }}>Corporate Travel</a>
-              <a href="#" style={{ color: "#c5c8cf" }}>Safety & Compliance</a>
-            </div>
-            <div>
-              <h4 style={{ color: GOLD }}>Cities</h4>
-              <a href="#" style={{ color: "#c5c8cf" }}>Toronto · Ottawa · Montréal</a>
-              <a href="#" style={{ color: "#c5c8cf" }}>Vancouver · Calgary · Edmonton</a>
-              <a href="#" style={{ color: "#c5c8cf" }}>Québec City · Niagara Falls · Hamilton</a>
-            </div>
-            <div>
-              <h4 style={{ color: GOLD }}>Contact</h4>
-              <a href="mailto:corporate@maplepont.ca" style={{ color: "#c5c8cf" }}>corporate@maplepont.ca</a>
-              <a href="tel:+18886275313" style={{ color: "#c5c8cf" }}>+1 (888) 627-5313</a>
-              <p style={{ fontSize: '11px', marginTop: '10px', color: 'rgba(255,255,255,0.4)' }}>
-                100 King St W, Suite 5600, Toronto, ON
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="footer-bottom" style={{ borderTop: "1px solid rgba(255,255,255,0.1)", color: "#8a8e95" }}>
-          <span>© 2026 Maplebridge. All rights reserved. All pricing in CAD.</span>
-          <span>No platforms. No aggregators. Accountable ground transportation.</span>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
