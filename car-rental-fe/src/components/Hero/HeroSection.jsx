@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroScene from "./HeroScene";
 import NavDrawer from "../Navbar/NavDrawer";
 import Footer from "../Footer/footer";
+import Carousel from './Carousel'
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -335,6 +336,28 @@ export default function HeroSection() {
             <div className="stat-label" style={{ color: "#4a4d55" }}>{label}</div>
           </div>
         ))}
+      </section>
+
+      {/* FLEET SHOWCASE */}
+      <section className="fleet-showcase">
+        <div className="fleet-showcase-header">
+          <span className="eyebrow">The Maplebridge Fleet</span>
+          <h2>First-Class Vehicles, Certified Chauffeurs</h2>
+          <p>
+            Experience the standard of institutional ground transportation. Our fleet features
+            late-model executive SUVs, luxury sedans, and high-capacity sprinters,
+            all operated by professional local chauffeurs.
+          </p>
+        </div>
+        <div className="fleet-showcase-carousel-wrapper">
+          <Carousel
+            baseWidth={420}
+            autoplay={true}
+            autoplayDelay={4500}
+            pauseOnHover={true}
+            loop={true}
+          />
+        </div>
       </section>
 
       {/* ABOUT / PHILOSOPHY */}

@@ -664,3 +664,212 @@ em {
     animation: none !important;
   }
 }
+
+/* carosuel animation  */
+
+.carousel-container {
+  position: relative;
+  overflow: visible; /* Allow adjacent 3D rotated cards to peek through */
+  margin: 0 auto;
+  padding: 20px 0;
+  height: 520px; /* Perfect height for vertical aspect ratios */
+}
+
+.carousel-track {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  touch-action: pan-y;
+}
+
+.carousel-item {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 20px;
+  background-color: #1a1b1e;
+  overflow: hidden;
+  cursor: grab;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.carousel-item:active {
+  cursor: grabbing;
+}
+
+.carousel-item:hover {
+  border-color: var(--gold-soft);
+  box-shadow: 0 25px 50px rgba(179, 147, 89, 0.15);
+}
+
+.carousel-item-img-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.carousel-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.carousel-item:hover .carousel-item-img {
+  transform: scale(1.06);
+}
+
+.carousel-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(17, 18, 21, 0.1) 0%,
+    rgba(17, 18, 21, 0.45) 50%,
+    rgba(17, 18, 21, 0.9) 100%
+  );
+  z-index: 2;
+}
+
+.carousel-item-body {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 30px;
+}
+
+.carousel-item-tag {
+  align-self: flex-start;
+  background: rgba(184, 151, 83, 0.9); /* premium gold color overlay */
+  color: #111215;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  padding: 5px 10px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.carousel-item-content {
+  padding: 0;
+  margin-top: auto;
+}
+
+.carousel-item-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.carousel-item-description {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+.carousel-indicators-container {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.carousel-indicators {
+  display: flex;
+  width: 120px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.carousel-indicator {
+  height: 8px;
+  width: 8px;
+  border: none;
+  padding: 0;
+  appearance: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 200ms ease, transform 200ms ease;
+}
+
+.carousel-indicator:focus-visible {
+  outline: 2px solid var(--gold-soft);
+  outline-offset: 2px;
+}
+
+.carousel-indicator.active {
+  background-color: var(--gold-soft);
+  width: 24px; /* Pill-shaped indicator for active item */
+  border-radius: 4px;
+}
+
+.carousel-indicator.inactive {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.carousel-indicator.inactive:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ---------------- FLEET SHOWCASE SECTION ---------------- */
+.fleet-showcase {
+  background-color: #0b0c0e;
+  color: #fff;
+  padding: 120px 8% 100px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgba(201, 168, 105, 0.15);
+  border-bottom: 1px solid rgba(201, 168, 105, 0.15);
+}
+
+.fleet-showcase-header {
+  max-width: 700px;
+  margin: 0 auto 50px;
+}
+
+.fleet-showcase-header .eyebrow {
+  color: var(--gold-soft);
+}
+
+.fleet-showcase-header h2 {
+  font-size: clamp(34px, 4.5vw, 56px);
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 20px;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.fleet-showcase-header p {
+  color: #9ea0a6;
+  font-size: 16px;
+  line-height: 1.8;
+  font-weight: 300;
+  font-family: 'Jost', sans-serif;
+}
+
+.fleet-showcase-carousel-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  perspective: 1200px;
+}
