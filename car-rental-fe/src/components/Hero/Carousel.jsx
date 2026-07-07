@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { motion, useMotionValue, useTransform } from 'motion/react';
+import { motion, useMotionValue, useTransform, animate } from 'motion/react';
 
 const DEFAULT_ITEMS = [
     {
@@ -33,11 +33,12 @@ const DEFAULT_ITEMS = [
 ];
 
 const DRAG_BUFFER = 0;
+const INSTANT_TRANSITION = { duration: 0 };
 const VELOCITY_THRESHOLD = 500;
 const GAP = 20;
 const SPRING_OPTIONS = { type: 'spring', stiffness: 300, damping: 30 };
 
-function CarouselItem({ item, index, itemWidth, trackItemOffset, x, transition }) {
+function CarouselItem({ item, index, itemWidth, trackItemOffset, x }) {
     const range = [-(index + 1) * trackItemOffset, -index * trackItemOffset, -(index - 1) * trackItemOffset];
     const outputRange = [45, 0, -45];
     const rotateY = useTransform(x, range, outputRange, { clamp: false });
@@ -51,20 +52,19 @@ function CarouselItem({ item, index, itemWidth, trackItemOffset, x, transition }
                 height: '100%',
                 rotateY: rotateY
             }}
-            transition={transition}
         >
             {item.image && (
                 <div className="carousel-item-img-container">
-                    <img 
-                        src={item.image} 
-                        alt={item.title} 
-                        className="carousel-item-img" 
+                    <img
+                        src={item.image}
+                        alt={item.title}
+                        className="carousel-item-img"
                         draggable="false"
                     />
                     <div className="carousel-item-overlay" />
                 </div>
             )}
-            
+
             <div className="carousel-item-body">
                 {item.tag && <span className="carousel-item-tag">{item.tag}</span>}
                 <div className="carousel-item-content">
@@ -85,21 +85,20 @@ export default function Carousel({
     loop = true
 }) {
     const containerPadding = 16;
-    
+
     const containerRef = useRef(null);
     const [containerWidth, setContainerWidth] = useState(baseWidth);
 
     useEffect(() => {
         if (!containerRef.current) return;
-        
+
         const resizeObserver = new ResizeObserver((entries) => {
             for (let entry of entries) {
-                // Ensure we don't exceed baseWidth on desktop, but scale down on mobile
                 const width = Math.min(entry.contentRect.width || baseWidth, baseWidth);
                 setContainerWidth(width);
             }
         });
-        
+
         resizeObserver.observe(containerRef.current);
         return () => resizeObserver.disconnect();
     }, [baseWidth]);
@@ -117,7 +116,24 @@ export default function Carousel({
     const x = useMotionValue(0);
     const [isHovered, setIsHovered] = useState(false);
     const [isJumping, setIsJumping] = useState(false);
-    const [isAnimating, setIsAnimating] = useState(false);
+
+    // Tracks the in-flight imperative animation so a drag can cancel it instantly.
+    const activeAnimationRef = useRef(null);
+
+    // Reset to the correct starting slide only when the actual item set changes
+    // (NOT on every resize — trackItemOffset is intentionally excluded here).
+    useEffect(() => {
+        const startingPosition = loop ? 1 : 0;
+        setPosition(startingPosition);
+        x.set(-startingPosition * trackItemOffset);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [items.length, loop]);
+
+    useEffect(() => {
+        if (!loop && position > itemsForRender.length - 1) {
+            setPosition(Math.max(0, itemsForRender.length - 1));
+        }
+    }, [itemsForRender.length, loop, position]);
 
     useEffect(() => {
         if (pauseOnHover && containerRef.current) {
@@ -144,56 +160,43 @@ export default function Carousel({
         return () => clearInterval(timer);
     }, [autoplay, autoplayDelay, isHovered, pauseOnHover, itemsForRender.length]);
 
+    // This is the ONLY place that moves x for a real slide change.
+    // It is entirely separate from drag — drag controls x directly via the
+    // gesture, and this effect is what fires afterward once `position` settles.
     useEffect(() => {
-        const startingPosition = loop ? 1 : 0;
-        setPosition(startingPosition);
-        x.set(-startingPosition * trackItemOffset);
-    }, [items.length, loop, trackItemOffset, x]);
+        const target = -(position * trackItemOffset);
 
-    useEffect(() => {
-        if (!loop && position > itemsForRender.length - 1) {
-            setPosition(Math.max(0, itemsForRender.length - 1));
-        }
-    }, [itemsForRender.length, loop, position]);
+        activeAnimationRef.current?.stop();
+        const controls = animate(x, target, isJumping ? INSTANT_TRANSITION : SPRING_OPTIONS);
+        activeAnimationRef.current = controls;
 
-    const effectiveTransition = isJumping ? { duration: 0 } : SPRING_OPTIONS;
+        controls.then(() => {
+            if (!loop || itemsForRender.length <= 1) {
+                return;
+            }
+            const lastCloneIndex = itemsForRender.length - 1;
 
-    const handleAnimationStart = () => {
-        setIsAnimating(true);
-    };
-
-    const handleAnimationComplete = () => {
-        if (!loop || itemsForRender.length <= 1) {
-            setIsAnimating(false);
-            return;
-        }
-        const lastCloneIndex = itemsForRender.length - 1;
-
-        if (position === lastCloneIndex) {
-            setIsJumping(true);
-            const target = 1;
-            setPosition(target);
-            x.set(-target * trackItemOffset);
-            requestAnimationFrame(() => {
+            if (position === lastCloneIndex) {
+                setIsJumping(true);
+                setPosition(1);
+                x.set(-1 * trackItemOffset);
+            } else if (position === 0) {
+                setIsJumping(true);
+                setPosition(items.length);
+                x.set(-items.length * trackItemOffset);
+            } else if (isJumping) {
                 setIsJumping(false);
-                setIsAnimating(false);
-            });
-            return;
-        }
+            }
+        });
 
-        if (position === 0) {
-            setIsJumping(true);
-            const target = items.length;
-            setPosition(target);
-            x.set(-target * trackItemOffset);
-            requestAnimationFrame(() => {
-                setIsJumping(false);
-                setIsAnimating(false);
-            });
-            return;
-        }
+        return () => controls.stop();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [position, trackItemOffset]);
 
-        setIsAnimating(false);
+    // Kill any in-flight programmatic animation the instant a drag starts,
+    // so drag and the snap-animation never fight over the same value.
+    const handleDragStart = () => {
+        activeAnimationRef.current?.stop();
     };
 
     const handleDragEnd = (_, info) => {
@@ -205,7 +208,13 @@ export default function Carousel({
                     ? -1
                     : 0;
 
-        if (direction === 0) return;
+        if (direction === 0) {
+            // Snap back to the current slide since the drag didn't clear the threshold.
+            const target = -(position * trackItemOffset);
+            activeAnimationRef.current?.stop();
+            activeAnimationRef.current = animate(x, target, SPRING_OPTIONS);
+            return;
+        }
 
         setPosition(prev => {
             const next = prev + direction;
@@ -237,7 +246,7 @@ export default function Carousel({
         >
             <motion.div
                 className="carousel-track"
-                drag={isAnimating ? false : 'x'}
+                drag="x"
                 {...dragProps}
                 style={{
                     width: itemWidth,
@@ -246,11 +255,8 @@ export default function Carousel({
                     perspectiveOrigin: `${position * trackItemOffset + itemWidth / 2}px 50%`,
                     x
                 }}
+                onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
-                animate={{ x: -(position * trackItemOffset) }}
-                transition={effectiveTransition}
-                onAnimationStart={handleAnimationStart}
-                onAnimationComplete={handleAnimationComplete}
             >
                 {itemsForRender.map((item, index) => (
                     <CarouselItem
@@ -260,7 +266,6 @@ export default function Carousel({
                         itemWidth={itemWidth}
                         trackItemOffset={trackItemOffset}
                         x={x}
-                        transition={effectiveTransition}
                     />
                 ))}
             </motion.div>

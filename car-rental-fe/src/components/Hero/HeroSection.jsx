@@ -268,7 +268,7 @@ export default function HeroSection() {
       {/* HERO */}
       <section className="hero">
         <div className="hero-canvas">
-          <HeroScene />
+          {/* <HeroScene /> */}
         </div>
 
         <div className="hero-overlay">
