@@ -1,11 +1,15 @@
+import { Link } from "react-router-dom";
+
 export default function NavDrawer({ open, setOpen }) {
     const links = [
-        "Institutional Services",
-        "Coverage Area",
-        "Events & Delegations",
-        "Safety & Compliance",
-        "Corporate Transportation"
+        { label: "Institutional Services", path: "/institutional-services" },
+        { label: "Coverage Area", path: "/coverage-area" },
+        { label: "Events & Delegations", path: "/events-delegations" },
+        { label: "Safety & Compliance", path: "/safety-compliance" },
+        { label: "Corporate Transportation", path: "/corporate-transportation" },
+        { label: "About Us", path: "/about-us" },
     ];
+
     return (
         <>
             <button className="nav-toggle light" onClick={() => setOpen(!open)} aria-label="menu">
@@ -14,17 +18,15 @@ export default function NavDrawer({ open, setOpen }) {
                 <span className={`bar ${open ? "open" : ""}`} />
             </button>
 
-
-
             <div className={`nav-drawer light ${open ? "active" : ""}`}>
                 <div className="nav-drawer-inner">
                     <div className="nav-mark">MAPLEBRIDGE</div>
                     <ul>
-                        {links.map((l, i) => (
-                            <li key={l} style={{ transitionDelay: `${i * 60}ms` }}>
-                                <a href="#" onClick={() => setOpen(false)}>
-                                    {l}
-                                </a>
+                        {links.map((link, i) => (
+                            <li key={link.path} style={{ transitionDelay: `${i * 60}ms` }}>
+                                <Link to={link.path} onClick={() => setOpen(false)}>
+                                    {link.label}
+                                </Link>
                             </li>
                         ))}
                     </ul>
