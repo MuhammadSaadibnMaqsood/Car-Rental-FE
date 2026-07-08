@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Carousel from "../Hero/Carousel";
+import ScrollStack, { ScrollStackItem } from "./ScrollStack";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,6 +14,44 @@ const STATS = [
   ["20+", "Years Experience"],
   ["PIPEDA", "Compliant Data Handling"],
   ["CAD", "Consolidated Billing"],
+];
+
+const STACK_CARDS = [
+  {
+    id: "executive-suv",
+    title: "Executive SUVs",
+    badge: "Signature Car",
+    image: "/carousel-img/2026-suburban-mov-design-02-v2.avif",
+    description:
+      "A refined arrival experience for executives, diplomats, and VIP guests with premium cabin comfort and discreet service.",
+    features: [
+      "Airport meet & greet",
+      "Quiet luxury cabin",
+      "Live flight monitoring",
+    ],
+  },
+  {
+    id: "luxury-sedan",
+    title: "Luxury Sedans",
+    badge: "Airport Ready",
+    image: "/carousel-img/images (1).jpg",
+    description:
+      "Ideal for polished business travel, discreet transfers, and seamless multi-stop itineraries across the city.",
+    features: [
+      "Executive seating",
+      "Complimentary water",
+      "Flexible scheduling",
+    ],
+  },
+  {
+    id: "sprinter-van",
+    title: "Corporate Sprinters",
+    badge: "Group Transfer",
+    image: "/carousel-img/images.jpg",
+    description:
+      "Spacious, modern transport for delegations, events, and corporate groups that demand elevated coordination.",
+    features: ["Group comfort", "Luggage-ready", "Professional chauffeurs"],
+  },
 ];
 
 export default function AboutContent() {
@@ -181,10 +220,56 @@ export default function AboutContent() {
 
   return (
     <div>
+      <section className="about-stack-shell">
+        <div className="about-stack-intro">
+          <span className="eyebrow">Featured Fleet Experience</span>
+          <h2>
+            Luxury vehicles, styled for every arrival and every itinerary.
+          </h2>
+          <p>
+            Explore our most requested transport options, each designed to
+            reflect the standard of a premium, professional ground experience.
+          </p>
+        </div>
+
+        <ScrollStack
+          className="about-stack-section"
+          useWindowScroll
+          itemDistance={92}
+          itemStackDistance={38}
+          stackPosition="22%"
+          scaleEndPosition="12%"
+          baseScale={0.88}
+          blurAmount={0.9}
+          rotationAmount={0.4}
+        >
+          {STACK_CARDS.map((card) => (
+            <ScrollStackItem
+              key={card.id}
+              image={card.image}
+              mediaAlt={card.title}
+              badge={card.badge}
+              actionLabel="Request this vehicle"
+            >
+              <h3>{card.title}</h3>
+              <p>{card.description}</p>
+              <ul className="about-stack-tags">
+                {card.features.map((feature) => (
+                  <li key={feature}>{feature}</li>
+                ))}
+              </ul>
+            </ScrollStackItem>
+          ))}
+        </ScrollStack>
+      </section>
       <section
         ref={statsRef}
         className="stats light-strip"
-        style={{ backgroundColor: "#f0f1f5", borderTop: "1px solid #e1e2e6", borderBottom: "1px solid #e1e2e6" }}
+        style={{
+          backgroundColor: "#f0f1f5",
+          borderTop: "1px solid #e1e2e6",
+          borderBottom: "1px solid #e1e2e6",
+        }}
       >
         {STATS.map(([num, label], i) => (
           <div className="stat" key={label}>
@@ -196,7 +281,9 @@ export default function AboutContent() {
             >
               {num}
             </div>
-            <div className="stat-label" style={{ color: "#4a4d55" }}>{label}</div>
+            <div className="stat-label" style={{ color: "#4a4d55" }}>
+              {label}
+            </div>
           </div>
         ))}
       </section>
@@ -206,7 +293,10 @@ export default function AboutContent() {
           <span className="eyebrow">The Maplebridge Fleet</span>
           <h2>First-Class Vehicles, Certified Chauffeurs</h2>
           <p>
-            Experience the standard of institutional ground transportation. Our fleet features late-model executive SUVs, luxury sedans, and high-capacity sprinters, all operated by professional local chauffeurs.
+            Experience the standard of institutional ground transportation. Our
+            fleet features late-model executive SUVs, luxury sedans, and
+            high-capacity sprinters, all operated by professional local
+            chauffeurs.
           </p>
         </div>
         <div className="fleet-showcase-carousel-wrapper">
@@ -222,25 +312,40 @@ export default function AboutContent() {
 
       <section className="about">
         <div ref={aboutLeftRef} className="about-left">
-          <span className="eyebrow" style={{ color: GOLD }}>Built for Institutions</span>
+          <span className="eyebrow" style={{ color: GOLD }}>
+            Built for Institutions
+          </span>
           <h2 style={{ color: TEXT_DARK }}>
-            Not a ride-hailing platform.<br />Not an aggregator.
+            Not a ride-hailing platform.
+            <br />
+            Not an aggregator.
           </h2>
         </div>
         <div ref={aboutRightRef} className="about-right">
           <p style={{ color: "#4a4d55" }}>
-            Maplebridge is a professionally operated Canadian ground transportation company — structured for organisations that require formal proposals, service agreements, compliance documentation, and a single named account manager across all 9 supported Canadian cities.
+            Maplebridge is a professionally operated Canadian ground
+            transportation company — structured for organisations that require
+            formal proposals, service agreements, compliance documentation, and
+            a single named account manager across all 9 supported Canadian
+            cities.
           </p>
           <p style={{ color: "#4a4d55" }}>
-            When your executives, visiting international partners, and official guests arrive in Canada, Maplebridge ensures their ground transportation experience reflects the standard of the organisation they represent.
+            When your executives, visiting international partners, and official
+            guests arrive in Canada, Maplebridge ensures their ground
+            transportation experience reflects the standard of the organisation
+            they represent.
           </p>
         </div>
       </section>
 
       <section className="fleet" style={{ backgroundColor: "#f8f9fa" }}>
         <div ref={fleetTitleRef}>
-          <span className="eyebrow center" style={{ color: GOLD }}>What We Deliver</span>
-          <h2 className="fleet-title" style={{ color: TEXT_DARK }}>Operational Excellence Behind Every Assignment</h2>
+          <span className="eyebrow center" style={{ color: GOLD }}>
+            What We Deliver
+          </span>
+          <h2 className="fleet-title" style={{ color: TEXT_DARK }}>
+            Operational Excellence Behind Every Assignment
+          </h2>
         </div>
 
         <div className="fleet-grid">
@@ -275,7 +380,12 @@ export default function AboutContent() {
               key={card.title}
               ref={addCardRef}
               className={`${card.cls} tilt-card`}
-              style={{ backgroundColor: "#fff", border: "1px solid #e1e2e6", position: "relative", overflow: "hidden" }}
+              style={{
+                backgroundColor: "#fff",
+                border: "1px solid #e1e2e6",
+                position: "relative",
+                overflow: "hidden",
+              }}
               onMouseMove={handleCardMove}
               onMouseLeave={handleCardLeave}
             >
@@ -287,14 +397,22 @@ export default function AboutContent() {
         </div>
       </section>
 
-      <section ref={ctaSectionRef} className="cta-section" style={{ borderTop: "1px solid #e1e2e6" }}>
+      <section
+        ref={ctaSectionRef}
+        className="cta-section"
+        style={{ borderTop: "1px solid #e1e2e6" }}
+      >
         <div className="cta-inner">
-          <span className="eyebrow" style={{ color: GOLD }}>Engagement</span>
+          <span className="eyebrow" style={{ color: GOLD }}>
+            Engagement
+          </span>
           <h2 style={{ color: GOLD }}>
             National Service. <em style={{ color: GOLD }}>Local Precision.</em>
           </h2>
           <p style={{ color: "#4a4d55" }}>
-            Submit a formal proposal request through our secure institutional inquiry channel — or contact the corporate team directly. All submissions acknowledged within one business day.
+            Submit a formal proposal request through our secure institutional
+            inquiry channel — or contact the corporate team directly. All
+            submissions acknowledged within one business day.
           </p>
           <a
             href="#"

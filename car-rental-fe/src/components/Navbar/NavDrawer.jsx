@@ -20,7 +20,9 @@ export default function NavDrawer({ open, setOpen }) {
 
             <div className={`nav-drawer light ${open ? "active" : ""}`}>
                 <div className="nav-drawer-inner">
-                    <div className="nav-mark">MAPLEBRIDGE</div>
+                    <Link to="/" className="nav-mark">
+                        MAPLEBRIDGE
+                    </Link>
                     <ul>
                         {links.map((link, i) => (
                             <li key={link.path} style={{ transitionDelay: `${i * 60}ms` }}>

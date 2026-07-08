@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap");
 
 * {
   margin: 0;
@@ -19,7 +19,7 @@ html,
 body {
   background: var(--deep);
   color: var(--ivory);
-  font-family: 'Jost', sans-serif;
+  font-family: "Jost", sans-serif;
   overflow-x: hidden;
   scroll-behavior: smooth;
 }
@@ -35,7 +35,7 @@ h2,
 h3,
 .nav-mark,
 .footer-mark {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-weight: 500;
   letter-spacing: 0.01em;
 }
@@ -136,12 +136,14 @@ em {
   color: var(--ivory);
   text-decoration: none;
   font-size: 30px;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   display: inline-block;
   padding: 14px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   width: 100%;
-  transition: color 0.3s, padding-left 0.3s;
+  transition:
+    color 0.3s,
+    padding-left 0.3s;
 }
 
 .nav-drawer a:hover {
@@ -154,6 +156,58 @@ em {
   font-size: 13px;
   letter-spacing: 0.05em;
   margin-bottom: 6px;
+}
+
+/* ---------------- NAV: RESPONSIVE ---------------- */
+@media (max-width: 640px) {
+  .nav-toggle {
+    top: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+  }
+
+  .nav-drawer {
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .nav-drawer-inner {
+    padding: 80px 28px 40px;
+    overflow-y: auto;
+  }
+
+  .nav-mark {
+    font-size: 22px;
+  }
+
+  .nav-drawer ul {
+    margin-top: 40px;
+  }
+
+  .nav-drawer a {
+    font-size: 22px;
+    padding: 12px 0;
+  }
+
+  .nav-foot p {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .nav-drawer-inner {
+    padding: 70px 20px 30px;
+  }
+
+  .nav-drawer a {
+    font-size: 19px;
+  }
+}
+
+/* safety net for short viewports (e.g. mobile landscape) at any width */
+.nav-drawer-inner {
+  overflow-y: auto;
 }
 
 /* ---------------- HERO ---------------- */
@@ -341,7 +395,7 @@ em {
 }
 
 .stat-num {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 44px;
   color: var(--gold-soft);
 }
@@ -560,7 +614,52 @@ em {
   }
 }
 
+/* ---------------- FOOTER: RESPONSIVE ---------------- */
+@media (max-width: 900px) {
+  .footer-top {
+    flex-direction: column;
+    gap: 40px;
+  }
 
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 40px;
+    width: 100%;
+  }
+
+  .footer-links > div {
+    flex: 1 1 200px;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer {
+    padding: 70px 6% 24px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .footer-mark {
+    font-size: 28px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+  }
+}
+
+/* safety net at any width: keeps long inline text (city lists, long lines) from forcing horizontal overflow */
+.footer-links a,
+.footer-bottom span {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
 /* CLAUDE  */
 
 /* Add these to your existing stylesheet (e.g. hero.css) alongside the current rules.
@@ -606,7 +705,11 @@ em {
   width: 260px;
   height: 260px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(184, 151, 83, 0.16) 0%, rgba(184, 151, 83, 0) 70%);
+  background: radial-gradient(
+    circle,
+    rgba(184, 151, 83, 0.16) 0%,
+    rgba(184, 151, 83, 0) 70%
+  );
   transform: translate(-50%, -50%);
   opacity: 0;
   pointer-events: none;
@@ -654,7 +757,6 @@ em {
 
 /* Respect reduced-motion users: fall back to a simple fade, no parallax/tilt */
 @media (prefers-reduced-motion: reduce) {
-
   .tilt-card,
   .hero-canvas,
   .btn-gold,
@@ -694,7 +796,9 @@ em {
   cursor: grab;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .carousel-item:active {
@@ -767,7 +871,7 @@ em {
 }
 
 .carousel-item-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 26px;
   font-weight: 500;
   color: #fff;
@@ -777,7 +881,7 @@ em {
 }
 
 .carousel-item-description {
-  font-family: 'Jost', sans-serif;
+  font-family: "Jost", sans-serif;
   font-size: 14px;
   color: rgba(255, 255, 255, 0.75);
   line-height: 1.6;
@@ -806,7 +910,9 @@ em {
   appearance: none;
   border-radius: 50%;
   cursor: pointer;
-  transition: background-color 200ms ease, transform 200ms ease;
+  transition:
+    background-color 200ms ease,
+    transform 200ms ease;
 }
 
 .carousel-indicator:focus-visible {
@@ -854,7 +960,7 @@ em {
   color: #fff;
   line-height: 1.2;
   margin-bottom: 20px;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
 }
 
 .fleet-showcase-header p {
@@ -862,7 +968,7 @@ em {
   font-size: 16px;
   line-height: 1.8;
   font-weight: 300;
-  font-family: 'Jost', sans-serif;
+  font-family: "Jost", sans-serif;
 }
 
 .fleet-showcase-carousel-wrapper {
@@ -872,4 +978,189 @@ em {
   width: 100%;
   position: relative;
   perspective: 1200px;
+}
+
+/* ABOUT STACK CSS */
+
+.scroll-stack-scroller {
+  position: relative;
+  width: 100%;
+  /* remove height: 100%, overflow-y: auto, overscroll-behavior, -webkit-overflow-scrolling */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+.scroll-stack-inner {
+  padding: 20vh 5rem 50rem;
+  min-height: 100vh;
+}
+
+.scroll-stack-card-wrapper {
+  position: relative;
+}
+
+.scroll-stack-card {
+  transform-origin: top center;
+  will-change: transform, filter;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+  height: 20rem;
+  width: 100%;
+  margin: 30px 0;
+  padding: 3rem;
+  border-radius: 40px;
+  box-sizing: border-box;
+  /* Improve mobile performance */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  position: relative;
+}
+
+.scroll-stack-end {
+  width: 100%;
+  height: 1px;
+}
+
+.about-stack-shell {
+  padding: 120px 8% 40px;
+  background: linear-gradient(180deg, #f8f6f1 0%, #f2ebdf 100%);
+}
+
+.about-stack-intro {
+  max-width: 760px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.about-stack-intro h2 {
+  font-size: clamp(32px, 3.4vw, 46px);
+  color: #111215;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.about-stack-intro p {
+  color: #5f636b;
+  font-size: 16px;
+  line-height: 1.8;
+  font-weight: 300;
+}
+
+.about-stack-section {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.scroll-stack-card {
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 16, 20, 0.98),
+    rgba(31, 32, 37, 0.95)
+  );
+  color: #f7f3ea;
+  border: 1px solid rgba(201, 168, 105, 0.22);
+  padding: 0;
+  border-radius: 32px;
+  display: flex;
+  min-height: 420px;
+  box-shadow: 0 26px 70px rgba(16, 18, 24, 0.22);
+}
+
+.scroll-stack-card-media {
+  flex: 0 0 48%;
+  min-height: 100%;
+}
+
+.scroll-stack-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.scroll-stack-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 34px 36px;
+  position: relative;
+  z-index: 1;
+}
+
+.scroll-stack-card-badge {
+  align-self: flex-start;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #f2d08d;
+  background: rgba(184, 151, 83, 0.16);
+  border: 1px solid rgba(184, 151, 83, 0.25);
+  padding: 8px 10px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+
+.scroll-stack-card h3 {
+  font-size: 30px;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.scroll-stack-card p {
+  font-size: 15px;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 18px;
+}
+
+.about-stack-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+}
+
+.about-stack-tags li {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f7f3ea;
+}
+
+.scroll-stack-card-link {
+  margin-top: 22px;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #e6c684;
+}
+
+@media (max-width: 900px) {
+  .about-stack-shell {
+    padding: 100px 6% 30px;
+  }
+
+  .scroll-stack-card {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .scroll-stack-card-media {
+    flex-basis: auto;
+    min-height: 240px;
+  }
+
+  .scroll-stack-card-body {
+    padding: 26px 24px 28px;
+  }
 }
